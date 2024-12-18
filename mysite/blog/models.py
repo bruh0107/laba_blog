@@ -3,9 +3,14 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 class CustomUser(AbstractUser):
-    username = models.CharField(max_length=150, blank=True)
+    username = models.CharField(max_length=150, unique=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(blank=True)
+    email = models.EmailField(max_length=150, verbose_name='Email', unique=True)
+    password = models.CharField(max_length=150, verbose_name='Пароль')
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'avatar']
 
     def __str__(self):
         return self.username
