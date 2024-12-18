@@ -2,20 +2,45 @@
 {% block content %}
 {% for post in page_obj %}
   <div class="post">
-    <h3>Автор: {{ post.author_name }}</h3>
+    <h3>Автор: {{ post.author.username|default:"Удалённый пользователь" }}</h3>
     <p>Опубликовано: {{ post.created_at|date:"d M Y, H:i" }}</p>
     <p>{{ post.content }}</p>
     <p>Комментарии: {{ post.comments.count }}</p>
+    {% for comment in post.comments.all %}
+        <p>{{ comment.content }} — {{ comment.author.username|default:"Удалённый пользователь" }}</p>
+        {% if comment.author == request.user %}
+            <a href="{% url 'blog:edit_comment' comment.id %}">Редактировать комментарий</a>
+            <a href="{% url 'blog:delete_comment' comment.id %}">Удалить комментарий</a>
+        {% endif %}
+      {% empty %}
+      <p>Комментариев пока нет...</p>
+    {% endfor %}
+    {% if user.is_authenticated %}
+        <h5>Добавить комментарий</h5>
+        <form method="post" class="form py-3" action="{% url 'blog:add_comment' post.id %}">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-success">Отправить комментарий</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'blog:login' %}">Войдите</a> в систему, чтобы оставить комментарий.</p>
+    {% endif %}
     <form method="post" action="{% url 'blog:like_post' post.id %}">
       {% csrf_token %}
-      <button type="submit">
-        {% if user in post.likes.all %}
-          👍 Лайкнуто ({{ post.like_count }})
-        {% else %}
-          👍 Лайкнуть ({{ post.like_count }})
+        {% if user.is_authenticated %}
+          <button type="submit">
+            {% if user in post.likes.all %}
+              👍 Лайкнуто ({{ post.like_count }})
+            {% else %}
+              👍 Лайкнуть ({{ post.like_count }})
+            {% endif %}
+          </button>
         {% endif %}
-      </button>
     </form>
+    {% if post.author == request.user %}
+      <a href="{% url 'blog:edit_post' post.id %}">Редактировать</a>
+      <a href="{% url 'blog:delete_post' post.id %}">Удалить</a>
+    {% endif %}
   </div>
   <hr>
 {% endfor %}

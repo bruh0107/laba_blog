@@ -19,10 +19,13 @@ def home(request):
         for post in page_obj.object_list
     ]
 
+    comment_form = CommentForm()
+
     return render(request, "blog/home.html", {
         "posts": posts,
         "page_obj": page_obj,
-        "comment_count": comment_count
+        "comment_count": comment_count,
+        "comment_form": comment_form,
     })
 
 @login_required
@@ -72,6 +75,27 @@ def add_comment(request, post_id):
             return redirect("blog:home")
     return redirect("blog:home")
 
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    if request.method == "POST":
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Ваш комментарий был обновлен")
+            return redirect('blog:home')
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, "blog/edit_comment.html", {"form": form, "comment": comment})
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, authpr=request.user)
+    if request.method == "POST":
+        comment.delete()
+        messages.success(request, "Ваш комментарий был удален")
+    return render(request, "blog/delete_comment.html", {"comment": comment})
+
 def register(request):
     if request.method == "POST":
         form = CustomUserCreatingForm(request.POST, request.FILES)
@@ -88,10 +112,7 @@ def delete_profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
     if request.user == user:
         user.posts.update(author=None)
-        user.posts.update(author_name="Удаленный пользователь")
-
         Comment.objects.filter(author=user).update(author=None)
-        Comment.objects.filter(author=user).update(author_name="Удалённый пользователь")
 
         user.delete()
         messages.success(request, 'Ваш профиль удален.')
