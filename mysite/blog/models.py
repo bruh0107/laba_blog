@@ -16,7 +16,8 @@ class CustomUser(AbstractUser):
         return self.username
 
 class Post(models.Model):
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='posts')
+    author = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
+    author_name = models.CharField(max_length=100, blank=True, default="Удалённый пользователь")
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
@@ -25,12 +26,21 @@ class Post(models.Model):
     def __str__(self):
         return f"Пост от {self.author.username} в {self.created_at}"
 
+    def save(self, *args, **kwargs):
+        if self.author:
+            self.author_name = self.author.username
+        super().save(*args, **kwargs)
+
     def comments_count(self):
-        return self.comments.count()
+        return Comment.objects.filter(post=self).count()
+
+    def like_count(self):
+        return self.likes.count()
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    author_name = models.CharField(max_length=100, blank=True, default="Удалённый пользователь")
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)

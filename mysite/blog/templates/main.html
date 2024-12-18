@@ -12,7 +12,7 @@
 <body>
 <header class="bg-success">
     <div class="container d-flex align-center justify-content-between py-2">
-        <a href="" class="nav-link link-light fs-4">Блог</a>
+        <a href="{% url 'blog:home' %}" class="nav-link link-light fs-4">Блог</a>
         <nav class="nav">
             {% if not user.is_authenticated %}
                 <a class="nav-link link-light fs-5" href="{% url 'blog:register' %}">Регистрация</a>

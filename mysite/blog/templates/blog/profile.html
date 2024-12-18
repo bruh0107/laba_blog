@@ -13,6 +13,6 @@
         <p>{{ user.bio }}</p>
     </div>
     <a class="btn btn-success" href="{% url 'blog:edit_profile' username=user.username %}">Изменить профиль</a>
-    <a class="btn btn-danger" href="">Удалить профиль</a>
+    <a class="btn btn-danger" href="{% url 'blog:delete_profile' username=user.username %}">Удалить профиль</a>
 </div>
 {% endblock %}

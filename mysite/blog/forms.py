@@ -68,3 +68,6 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
+
+class LikeForm(forms.Form):
+    pass

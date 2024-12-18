@@ -1,5 +1,39 @@
 {% extends 'main.html' %}
 {% block content %}
-<h2>Главная</h2>
+{% for post in page_obj %}
+  <div class="post">
+    <h3>Автор: {{ post.author_name }}</h3>
+    <p>Опубликовано: {{ post.created_at|date:"d M Y, H:i" }}</p>
+    <p>{{ post.content }}</p>
+    <p>Комментарии: {{ post.comments.count }}</p>
+    <form method="post" action="{% url 'blog:like_post' post.id %}">
+      {% csrf_token %}
+      <button type="submit">
+        {% if user in post.likes.all %}
+          👍 Лайкнуто ({{ post.like_count }})
+        {% else %}
+          👍 Лайкнуть ({{ post.like_count }})
+        {% endif %}
+      </button>
+    </form>
+  </div>
+  <hr>
+{% endfor %}
 
+<div class="pagination">
+    <div class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; 1</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

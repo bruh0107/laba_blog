@@ -1,6 +1,15 @@
 {% extends 'main.html' %}
 {% block content %}
 
+<div class="mt-4">
+    <h2>Создать новый пост</h2>
 
+    <form method="post" class="form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success mt-2">Опубликовать</button>
+      <a href="{% url 'blog:home' %}" class="btn btn-danger mt-2">Отмена</a>
+    </form>
+</div>
 
 {% endblock %}
