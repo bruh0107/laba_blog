@@ -1,10 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends 'main.html' %}
+{% block content %}
+<h2>Профиль</h2>
+<br>
+<div class="profile">
+    <div class="avatar">
+        <img src="{{ user.avatar.url }}" alt="Аватар пользователя" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;">
+    </div>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <div class="d-flex flex-column">
+        <p><strong>Ваше описание:</strong></p>
+        <p>{{ user.bio }}</p>
+    </div>
+    <a class="btn btn-success" href="{% url 'blog:edit_profile' username=user.username %}">Изменить профиль</a>
+    <a class="btn btn-danger" href="">Удалить профиль</a>
+</div>
+{% endblock %}
