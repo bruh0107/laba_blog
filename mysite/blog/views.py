@@ -90,10 +90,10 @@ def edit_comment(request, comment_id):
 
 @login_required
 def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, authpr=request.user)
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == "POST":
         comment.delete()
-        messages.success(request, "Ваш комментарий был удален")
+        return redirect('blog:home')
     return render(request, "blog/delete_comment.html", {"comment": comment})
 
 def register(request):
@@ -112,6 +112,7 @@ def delete_profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
     if request.user == user:
         user.posts.update(author=None)
+
         Comment.objects.filter(author=user).update(author=None)
 
         user.delete()
